@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  min-height: 100vh;
+}
+
+/* カスタムスタイル */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+}
+
+/* ファイルアップロードボタンのスタイル */
+input[type="file"] {
+  @apply block w-full text-sm text-gray-500
+    file:mr-4 file:py-2 file:px-4
+    file:rounded-full file:border-0
+    file:text-sm file:font-semibold
+    file:bg-blue-50 file:text-blue-700
+    hover:file:bg-blue-100;
+}
+
+/* ボタンのスタイル */
+.btn {
+  @apply px-4 py-2 rounded-md font-medium transition-colors;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50;
+}
+
+/* グリッドレイアウト */
+.grid-container {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+/* 結果表示のスタイル */
+.result-item {
+  @apply mb-4;
+}
+
+.result-label {
+  @apply font-medium text-gray-700;
+}
+
+.result-value {
+  @apply text-gray-900;
+}
+
+/* プレビュー画像のスタイル */
+.preview-image {
+  @apply max-w-full h-auto rounded-lg;
+}
+
+/* エラーメッセージのスタイル */
+.error-message {
+  @apply text-red-500 mt-2;
+}
+
+/* ローディング表示のスタイル */
+.loading {
+  @apply text-gray-600;
+} 

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///Users/bunkohei/dev/sandbox/tsuncore/next-app/src/app/layout.tsx"],"sourcesContent":["import './globals.css';\nimport 'bootstrap/dist/css/bootstrap.min.css';\nimport type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: '店舗情報抽出アプリ',\n  description: '画像から店舗情報を抽出するアプリケーション',\n};\n\nexport default function RootLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <html lang=\"ja\">\n      <body className=\"bg-light\">\n        <div className=\"container py-4\">\n          {children}\n        </div>\n      </body>\n    </html>\n  );\n} "],"names":[],"mappings":";;;;;;;;AAIO,MAAM,WAAqB;IAChC,OAAO;IACP,aAAa;AACf;AAEe,SAAS,WAAW,EACjC,QAAQ,EAGT;IACC,qBACE,8OAAC;QAAK,MAAK;kBACT,cAAA,8OAAC;YAAK,WAAU;sBACd,cAAA,8OAAC;gBAAI,WAAU;0BACZ;;;;;;;;;;;;;;;;AAKX","debugId":null}},
+    {"offset": {"line": 48, "column": 0}, "map": {"version":3,"sources":["file:///Users/bunkohei/dev/sandbox/tsuncore/next-app/node_modules/next/src/server/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.ts"],"sourcesContent":["module.exports = require('../../module.compiled').vendored[\n  'react-rsc'\n].ReactJsxDevRuntime\n"],"names":["module","exports","require","vendored","ReactJsxDevRuntime"],"mappings":";AAAAA,OAAOC,OAAO,GAAGC,QAAQ,4HAAyBC,QAAQ,CACxD,YACD,CAACC,kBAAkB","ignoreList":[0],"debugId":null}}]
+}

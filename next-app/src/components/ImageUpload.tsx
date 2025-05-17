@@ -1,0 +1,144 @@
+'use client';
+
+import { useState, ChangeEvent, FormEvent } from 'react';
+
+interface StoreInfo {
+  store_name?: string;
+  address?: string;
+  phone?: string;
+  hours?: string;
+  raw_response?: string;
+}
+
+interface UploadResponse {
+  filepath: string;
+  store_info: StoreInfo;
+}
+
+export default function ImageUpload() {
+  const [preview, setPreview] = useState<string>('');
+  const [storeInfo, setStoreInfo] = useState<StoreInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fileInput = form.querySelector('input[type="file"]') as HTMLInputElement;
+
+    if (!fileInput.files?.length) {
+      setError('ファイルを選択してください');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append('image', fileInput.files[0]);
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('アップロードに失敗しました');
+      }
+
+      const data: UploadResponse = await response.json();
+      setStoreInfo(data.store_info);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'エラーが発生しました');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="row g-4">
+      <div className="col-12">
+        <div className="card">
+          <div className="card-body">
+            <h2 className="card-title h4 mb-4">画像をアップロード</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="form-control"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="btn btn-primary"
+              >
+                {isLoading ? '解析中...' : '解析する'}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div className="col-12 col-md-6">
+        <div className="card">
+          <div className="card-body">
+            <h2 className="card-title h4 mb-4">アップロードされた画像</h2>
+            {preview ? (
+              <img src={preview} alt="プレビュー" className="img-fluid" />
+            ) : (
+              <p className="text-muted">画像を選択してください</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="col-12 col-md-6">
+        <div className="card">
+          <div className="card-body">
+            <h2 className="card-title h4 mb-4">抽出結果</h2>
+            {error ? (
+              <p className="text-danger">{error}</p>
+            ) : isLoading ? (
+              <p>解析中...</p>
+            ) : storeInfo ? (
+              <dl className="row">
+                {Object.entries(storeInfo).map(([key, value]) => {
+                  const label = {
+                    store_name: '店舗名',
+                    address: '住所',
+                    phone: '電話番号',
+                    hours: '営業時間',
+                    raw_response: '解析結果（生データ）',
+                  }[key] || key;
+                  return (
+                    <div key={key} className="col-12 mb-2">
+                      <dt className="fw-medium text-muted">{label}</dt>
+                      <dd>{value || '情報なし'}</dd>
+                    </div>
+                  );
+                })}
+              </dl>
+            ) : (
+              <p className="text-muted">画像をアップロードしてください</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 

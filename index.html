@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>店舗情報抽出アプリ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <style>
+        .container { max-width: 800px; margin-top: 50px; }
+        #preview { max-width: 100%; margin-top: 20px; }
+        #result { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">店舗情報抽出アプリ</h1>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">画像をアップロード</h5>
+                <form id="upload-form">
+                    <div class="mb-3">
+                        <input type="file" class="form-control" id="image-input" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">解析する</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">アップロードされた画像</h5>
+                        <img id="preview" class="d-none">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">抽出結果</h5>
+                        <div id="result">
+                            <p class="text-muted">画像をアップロードしてください</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('image-input');
+            if (!fileInput.files.length) {
+                alert('ファイルを選択してください');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            
+            // 解析中メッセージ
+            document.getElementById('result').innerHTML = '<p>解析中...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                // プレビュー画像を表示
+                const preview = document.getElementById('preview');
+                preview.src = '/' + data.filepath;
+                preview.classList.remove('d-none');
+                
+                // 結果を表示
+                const resultDiv = document.getElementById('result');
+                if (data.store_info) {
+                    let html = '<dl>';
+                    for (const [key, value] of Object.entries(data.store_info)) {
+                        const label = {
+                            'store_name': '店舗名',
+                            'address': '住所',
+                            'phone': '電話番号',
+                            'hours': '営業時間',
+                            'raw_response': '解析結果（生データ）'
+                        }[key] || key;
+                        
+                        html += `<dt>${label}</dt><dd>${value || '情報なし'}</dd>`;
+                    }
+                    html += '</dl>';
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<p>情報を抽出できませんでした</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = '<p class="text-danger">エラーが発生しました</p>';
+            }
+        });
+        
+        // 画像選択時にプレビュー表示
+        document.getElementById('image-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const preview = document.getElementById('preview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
