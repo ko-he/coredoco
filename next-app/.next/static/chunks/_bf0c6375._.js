@@ -19,7 +19,10 @@ function ImageUpload() {
     const [preview, setPreview] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
     const [storeInfo, setStoreInfo] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isGeneratingMap, setIsGeneratingMap] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [mapUrl, setMapUrl] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [mapError, setMapError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const handleImageChange = (e)=>{
         const file = e.target.files?.[0];
         if (file) {
@@ -58,6 +61,34 @@ function ImageUpload() {
             setIsLoading(false);
         }
     };
+    const handleGenerateMapUrl = async ()=>{
+        if (!storeInfo) return;
+        setIsGeneratingMap(true);
+        setMapError(null);
+        setMapUrl(null);
+        try {
+            const response = await fetch('/api/generate-map-url', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    store_info: storeInfo
+                })
+            });
+            const data = await response.json();
+            if (!response.ok || data.error) {
+                throw new Error(data.error || 'マップURLの生成に失敗しました');
+            }
+            if (data.map_url) {
+                setMapUrl(data.map_url);
+            }
+        } catch (err) {
+            setMapError(err instanceof Error ? err.message : 'エラーが発生しました');
+        } finally{
+            setIsGeneratingMap(false);
+        }
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "row g-4",
         children: [
@@ -73,7 +104,7 @@ function ImageUpload() {
                                 children: "画像をアップロード"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 75,
+                                lineNumber: 115,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -88,12 +119,12 @@ function ImageUpload() {
                                             className: "form-control"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ImageUpload.tsx",
-                                            lineNumber: 78,
+                                            lineNumber: 118,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ImageUpload.tsx",
-                                        lineNumber: 77,
+                                        lineNumber: 117,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -103,29 +134,29 @@ function ImageUpload() {
                                         children: isLoading ? '解析中...' : '解析する'
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ImageUpload.tsx",
-                                        lineNumber: 85,
+                                        lineNumber: 125,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 76,
+                                lineNumber: 116,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/ImageUpload.tsx",
-                        lineNumber: 74,
+                        lineNumber: 114,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/ImageUpload.tsx",
-                    lineNumber: 73,
+                    lineNumber: 113,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/ImageUpload.tsx",
-                lineNumber: 72,
+                lineNumber: 112,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -140,7 +171,7 @@ function ImageUpload() {
                                 children: "アップロードされた画像"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 100,
+                                lineNumber: 140,
                                 columnNumber: 13
                             }, this),
                             preview ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -149,30 +180,30 @@ function ImageUpload() {
                                 className: "img-fluid"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 102,
+                                lineNumber: 142,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 className: "text-muted",
                                 children: "画像を選択してください"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 104,
+                                lineNumber: 144,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/ImageUpload.tsx",
-                        lineNumber: 99,
+                        lineNumber: 139,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/ImageUpload.tsx",
-                    lineNumber: 98,
+                    lineNumber: 138,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/ImageUpload.tsx",
-                lineNumber: 97,
+                lineNumber: 137,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -187,7 +218,7 @@ function ImageUpload() {
                                 children: "抽出結果"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 113,
+                                lineNumber: 153,
                                 columnNumber: 13
                             }, this),
                             error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -195,85 +226,134 @@ function ImageUpload() {
                                 children: error
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 115,
+                                lineNumber: 155,
                                 columnNumber: 15
                             }, this) : isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 children: "解析中..."
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 117,
+                                lineNumber: 157,
                                 columnNumber: 15
-                            }, this) : storeInfo ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dl", {
-                                className: "row",
-                                children: Object.entries(storeInfo).map(([key, value])=>{
-                                    const label = {
-                                        store_name: '店舗名',
-                                        address: '住所',
-                                        phone: '電話番号',
-                                        hours: '営業時間',
-                                        raw_response: '解析結果（生データ）'
-                                    }[key] || key;
-                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "col-12 mb-2",
+                            }, this) : storeInfo ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dl", {
+                                        className: "row",
+                                        children: Object.entries(storeInfo).map(([key, value])=>{
+                                            const label = {
+                                                store_name: '店舗名',
+                                                address: '住所',
+                                                phone: '電話番号',
+                                                hours: '営業時間',
+                                                raw_response: '解析結果（生データ）'
+                                            }[key] || key;
+                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "col-12 mb-2",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
+                                                        className: "fw-medium text-muted",
+                                                        children: label
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/ImageUpload.tsx",
+                                                        lineNumber: 171,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
+                                                        children: value || '情報なし'
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/ImageUpload.tsx",
+                                                        lineNumber: 172,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, key, true, {
+                                                fileName: "[project]/src/components/ImageUpload.tsx",
+                                                lineNumber: 170,
+                                                columnNumber: 23
+                                            }, this);
+                                        })
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/ImageUpload.tsx",
+                                        lineNumber: 160,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mt-3",
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dt", {
-                                                className: "fw-medium text-muted",
-                                                children: label
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                onClick: handleGenerateMapUrl,
+                                                disabled: isGeneratingMap,
+                                                className: "btn btn-success",
+                                                children: isGeneratingMap ? '生成中...' : 'Google Maps URLを生成'
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                                lineNumber: 130,
-                                                columnNumber: 23
+                                                lineNumber: 178,
+                                                columnNumber: 19
                                             }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("dd", {
-                                                children: value || '情報なし'
+                                            mapError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-danger mt-2",
+                                                children: mapError
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                                lineNumber: 131,
-                                                columnNumber: 23
+                                                lineNumber: 186,
+                                                columnNumber: 21
+                                            }, this),
+                                            mapUrl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "mt-2",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                                    href: mapUrl,
+                                                    target: "_blank",
+                                                    rel: "noopener noreferrer",
+                                                    className: "btn btn-outline-primary",
+                                                    children: "Google Mapsで開く"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/ImageUpload.tsx",
+                                                    lineNumber: 190,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/ImageUpload.tsx",
+                                                lineNumber: 189,
+                                                columnNumber: 21
                                             }, this)
                                         ]
-                                    }, key, true, {
+                                    }, void 0, true, {
                                         fileName: "[project]/src/components/ImageUpload.tsx",
-                                        lineNumber: 129,
-                                        columnNumber: 21
-                                    }, this);
-                                })
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 119,
-                                columnNumber: 15
-                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        lineNumber: 177,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 className: "text-muted",
                                 children: "画像をアップロードしてください"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ImageUpload.tsx",
-                                lineNumber: 137,
+                                lineNumber: 203,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/ImageUpload.tsx",
-                        lineNumber: 112,
+                        lineNumber: 152,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/ImageUpload.tsx",
-                    lineNumber: 111,
+                    lineNumber: 151,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/ImageUpload.tsx",
-                lineNumber: 110,
+                lineNumber: 150,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/ImageUpload.tsx",
-        lineNumber: 71,
+        lineNumber: 111,
         columnNumber: 5
     }, this);
 }
-_s(ImageUpload, "2Mdx8sb2EuTdy5xv7VNdO7IMMuI=");
+_s(ImageUpload, "Rw5Vy2aSFhjEB0y1TbSzreQfTNE=");
 _c = ImageUpload;
 var _c;
 __turbopack_context__.k.register(_c, "ImageUpload");

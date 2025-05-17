@@ -37,7 +37,7 @@ def upload_image():
     
     # Gemini APIに画像を送信して店舗情報を抽出
     prompt = """
-    この画像は、google mapのスクリーンショットや、instagramの投稿画像です。
+    この画像はカフェや飲食店が記載された、google mapのスクリーンショットや、instagramの投稿画像です。
     画像から以下の情報を抽出してください：
     1. 店舗名
     2. 住所（できるだけ詳細に）
@@ -83,6 +83,55 @@ def upload_image():
         'filepath': filename,
         'store_info': store_info
     })
+
+@app.route('/generate-map-url', methods=['POST'])
+def generate_map_url():
+    data = request.get_json()
+    if not data or 'store_info' not in data:
+        return jsonify({'error': 'No store information provided'}), 400
+    
+    store_info = data['store_info']
+    if 'error' in store_info:
+        return jsonify({'error': store_info['error']}), 400
+    
+    # Gemini APIに店舗情報を送信してGoogle Maps URLを生成
+    prompt = f"""
+    以下の店舗情報から、Google Mapsの店舗ページを特定してURLを生成してください。
+    店舗名: {store_info.get('store_name', '')}
+    住所: {store_info.get('address', '')}
+    電話番号: {store_info.get('phone', '')}
+    
+    以下の形式でJSONを返してください：
+    {{
+        "map_url": "google mapsの店舗ページのURL"
+    }}
+    
+    注意:
+    1. 店舗名や住所が不明な場合は、利用可能な情報のみを使用してください
+    2. 情報が不足している場合は、以下のJSONを返してください
+    {{
+        "error": "情報が不足しているため店舗URLを生成できません"
+    }}
+    """
+    
+    response = model.generate_content(prompt)
+    
+    try:
+        # レスポンスからJSONを抽出
+        response_text = response.text
+        import re
+        import json
+        
+        json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+        if json_match:
+            json_str = json_match.group(0)
+            map_info = json.loads(json_str)
+        else:
+            map_info = {"error": "URLの生成に失敗しました", "raw_response": response_text}
+    except Exception as e:
+        map_info = {"error": str(e), "raw_response": response.text}
+    
+    return jsonify(map_info)
 
 if __name__ == '__main__':
     app.run(debug=True)

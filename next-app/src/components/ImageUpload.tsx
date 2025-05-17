@@ -15,11 +15,19 @@ interface UploadResponse {
   store_info: StoreInfo;
 }
 
+interface MapUrlResponse {
+  map_url?: string;
+  error?: string;
+}
+
 export default function ImageUpload() {
   const [preview, setPreview] = useState<string>('');
   const [storeInfo, setStoreInfo] = useState<StoreInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingMap, setIsGeneratingMap] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mapUrl, setMapUrl] = useState<string | null>(null);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -64,6 +72,38 @@ export default function ImageUpload() {
       setError(err instanceof Error ? err.message : 'エラーが発生しました');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGenerateMapUrl = async () => {
+    if (!storeInfo) return;
+
+    setIsGeneratingMap(true);
+    setMapError(null);
+    setMapUrl(null);
+
+    try {
+      const response = await fetch('/api/generate-map-url', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ store_info: storeInfo }),
+      });
+
+      const data: MapUrlResponse = await response.json();
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'マップURLの生成に失敗しました');
+      }
+
+      if (data.map_url) {
+        setMapUrl(data.map_url);
+      }
+    } catch (err) {
+      setMapError(err instanceof Error ? err.message : 'エラーが発生しました');
+    } finally {
+      setIsGeneratingMap(false);
     }
   };
 
@@ -116,23 +156,49 @@ export default function ImageUpload() {
             ) : isLoading ? (
               <p>解析中...</p>
             ) : storeInfo ? (
-              <dl className="row">
-                {Object.entries(storeInfo).map(([key, value]) => {
-                  const label = {
-                    store_name: '店舗名',
-                    address: '住所',
-                    phone: '電話番号',
-                    hours: '営業時間',
-                    raw_response: '解析結果（生データ）',
-                  }[key] || key;
-                  return (
-                    <div key={key} className="col-12 mb-2">
-                      <dt className="fw-medium text-muted">{label}</dt>
-                      <dd>{value || '情報なし'}</dd>
+              <>
+                <dl className="row">
+                  {Object.entries(storeInfo).map(([key, value]) => {
+                    const label = {
+                      store_name: '店舗名',
+                      address: '住所',
+                      phone: '電話番号',
+                      hours: '営業時間',
+                      raw_response: '解析結果（生データ）',
+                    }[key] || key;
+                    return (
+                      <div key={key} className="col-12 mb-2">
+                        <dt className="fw-medium text-muted">{label}</dt>
+                        <dd>{value || '情報なし'}</dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+                <div className="mt-3">
+                  <button
+                    onClick={handleGenerateMapUrl}
+                    disabled={isGeneratingMap}
+                    className="btn btn-success"
+                  >
+                    {isGeneratingMap ? '生成中...' : 'Google Maps URLを生成'}
+                  </button>
+                  {mapError && (
+                    <p className="text-danger mt-2">{mapError}</p>
+                  )}
+                  {mapUrl && (
+                    <div className="mt-2">
+                      <a
+                        href={mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-outline-primary"
+                      >
+                        Google Mapsで開く
+                      </a>
                     </div>
-                  );
-                })}
-              </dl>
+                  )}
+                </div>
+              </>
             ) : (
               <p className="text-muted">画像をアップロードしてください</p>
             )}

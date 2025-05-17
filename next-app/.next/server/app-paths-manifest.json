@@ -1,3 +1,5 @@
 {
-  "/api/upload/route": "app/api/upload/route.js"
+  "/api/generate-map-url/route": "app/api/generate-map-url/route.js",
+  "/api/upload/route": "app/api/upload/route.js",
+  "/page": "app/page.js"
 }
