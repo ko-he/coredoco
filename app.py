@@ -44,15 +44,18 @@ def upload_image():
     3. 電話番号（表示されている場合）
     
     JSONフォーマットで回答してください：
-    {
-        "store_name": "店舗名",
-        "address": "住所",
-        "phone": "電話番号",
-    }
+    [
+        {
+            "store_name": "店舗名",
+            "address": "住所",
+            "phone": "電話番号",
+        }
+    ]
 
     注意:
     1. instagramの投稿画像の場合は、アカウント名が表示されているので、それを店舗名として誤認しないように注意してください。
-    2. 抽出ができなかった場合は、以下のJSONを返してください。
+    2. 情報が複数抽出できる場合は、それらを配列に複数のオブジェクトを格納して返してください。
+    3. 抽出ができなかった場合は、以下のJSONを返してください。
     {
         "error": "抽出できなかった理由",
     }
@@ -64,24 +67,32 @@ def upload_image():
     try:
         # レスポンスからJSONを抽出
         response_text = response.text
-        # JSONの部分だけを抽出する処理（必要に応じて）
+        # JSONの部分だけを抽出する処理
         import re
         import json
         
-        json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+        # 配列形式のJSONを抽出
+        json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
         if json_match:
             json_str = json_match.group(0)
             store_info = json.loads(json_str)
         else:
-            # JSONが見つからない場合は、テキスト全体を返す
-            store_info = {"raw_response": response_text}
+            # 単一オブジェクトのJSONを抽出（エラーケース用）
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(0)
+                error_info = json.loads(json_str)
+                store_info = [error_info]  # エラー情報を配列に変換
+            else:
+                # JSONが見つからない場合は、テキスト全体をエラーとして配列に格納
+                store_info = [{"error": "JSONの解析に失敗しました", "raw_response": response_text}]
     except Exception as e:
-        store_info = {"error": str(e), "raw_response": response.text}
+        store_info = [{"error": str(e), "raw_response": response.text}]
     
     return jsonify({
         'filename': file.filename,
         'filepath': filename,
-        'store_info': store_info
+        'store_info': store_info  # 常に配列形式で返す
     })
 
 @app.route('/generate-map-url', methods=['POST'])
@@ -96,21 +107,21 @@ def generate_map_url():
     
     # Gemini APIに店舗情報を送信してGoogle Maps URLを生成
     prompt = f"""
-    以下の店舗情報から、Google Mapsの店舗ページを特定してURLを生成してください。
+    以下の店舗情報から、Google Mapsの検索URLを生成してください。
     店舗名: {store_info.get('store_name', '')}
     住所: {store_info.get('address', '')}
-    電話番号: {store_info.get('phone', '')}
     
     以下の形式でJSONを返してください：
     {{
-        "map_url": "google mapsの店舗ページのURL"
+        "map_url": "https://www.google.com/maps/search/?api=1&query=エンコードされた検索クエリ"
     }}
     
     注意:
-    1. 店舗名や住所が不明な場合は、利用可能な情報のみを使用してください
-    2. 情報が不足している場合は、以下のJSONを返してください
+    1. 検索クエリは「店舗名 住所」の形式で、URLエンコードしてください
+    2. 店舗名や住所が不明な場合は、利用可能な情報のみを使用してください
+    3. 情報が不足している場合は、以下のJSONを返してください
     {{
-        "error": "情報が不足しているため店舗URLを生成できません"
+        "error": "情報が不足しているためURLを生成できません"
     }}
     """
     

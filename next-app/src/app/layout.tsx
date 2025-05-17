@@ -14,6 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet" />
+      </head>
       <body className="bg-light">
         <div className="container py-4">
           {children}

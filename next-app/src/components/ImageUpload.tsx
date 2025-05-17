@@ -12,7 +12,7 @@ interface StoreInfo {
 
 interface UploadResponse {
   filepath: string;
-  store_info: StoreInfo;
+  store_info: StoreInfo[];
 }
 
 interface MapUrlResponse {
@@ -22,7 +22,7 @@ interface MapUrlResponse {
 
 export default function ImageUpload() {
   const [preview, setPreview] = useState<string>('');
-  const [storeInfo, setStoreInfo] = useState<StoreInfo | null>(null);
+  const [storeInfo, setStoreInfo] = useState<StoreInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingMap, setIsGeneratingMap] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,8 +75,8 @@ export default function ImageUpload() {
     }
   };
 
-  const handleGenerateMapUrl = async () => {
-    if (!storeInfo) return;
+  const handleGenerateMapUrl = async (index: number) => {
+    if (storeInfo.length === 0) return;
 
     setIsGeneratingMap(true);
     setMapError(null);
@@ -88,7 +88,7 @@ export default function ImageUpload() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ store_info: storeInfo }),
+        body: JSON.stringify({ store_info: storeInfo[index] }),
       });
 
       const data: MapUrlResponse = await response.json();
@@ -156,49 +156,51 @@ export default function ImageUpload() {
             ) : isLoading ? (
               <p>解析中...</p>
             ) : storeInfo ? (
-              <>
-                <dl className="row">
-                  {Object.entries(storeInfo).map(([key, value]) => {
-                    const label = {
-                      store_name: '店舗名',
-                      address: '住所',
-                      phone: '電話番号',
-                      hours: '営業時間',
-                      raw_response: '解析結果（生データ）',
-                    }[key] || key;
-                    return (
-                      <div key={key} className="col-12 mb-2">
-                        <dt className="fw-medium text-muted">{label}</dt>
-                        <dd>{value || '情報なし'}</dd>
+              storeInfo.map((info, index) => (
+                <div key={info.store_name}>
+                  <dl className="row">
+                    {Object.entries(info).map(([key, value]) => {
+                      const label = {
+                        store_name: '店舗名',
+                        address: '住所',
+                        phone: '電話番号',
+                        hours: '営業時間',
+                        raw_response: '解析結果（生データ）',
+                      }[key] || key;
+                      return (
+                        <div key={key} className="col-12 mb-2">
+                          <dt className="fw-medium text-muted">{label}</dt>
+                          <dd>{value || '情報なし'}</dd>
+                        </div>
+                      );
+                    })}
+                  </dl>
+                  <div className="mt-3">
+                    <button
+                      onClick={() => handleGenerateMapUrl(index)}
+                      disabled={isGeneratingMap}
+                      className="btn btn-success"
+                    >
+                      {isGeneratingMap ? '生成中...' : 'Google Maps URLを生成'}
+                    </button>
+                    {mapError && (
+                      <p className="text-danger mt-2">{mapError}</p>
+                    )}
+                    {mapUrl && (
+                      <div className="mt-2">
+                        <a
+                          href={mapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-outline-primary"
+                        >
+                          Google Mapsで開く
+                        </a>
                       </div>
-                    );
-                  })}
-                </dl>
-                <div className="mt-3">
-                  <button
-                    onClick={handleGenerateMapUrl}
-                    disabled={isGeneratingMap}
-                    className="btn btn-success"
-                  >
-                    {isGeneratingMap ? '生成中...' : 'Google Maps URLを生成'}
-                  </button>
-                  {mapError && (
-                    <p className="text-danger mt-2">{mapError}</p>
-                  )}
-                  {mapUrl && (
-                    <div className="mt-2">
-                      <a
-                        href={mapUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-outline-primary"
-                      >
-                        Google Mapsで開く
-                      </a>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </>
+              ))
             ) : (
               <p className="text-muted">画像をアップロードしてください</p>
             )}
