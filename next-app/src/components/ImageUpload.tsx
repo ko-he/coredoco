@@ -26,8 +26,8 @@ export default function ImageUpload() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingMap, setIsGeneratingMap] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mapUrl, setMapUrl] = useState<string | null>(null);
-  const [mapError, setMapError] = useState<string | null>(null);
+  const [mapUrl, setMapUrl] = useState<{ [key: number]: string }>({});
+  const [mapError, setMapError] = useState<{ [key: number]: string }>({});
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -79,8 +79,8 @@ export default function ImageUpload() {
     if (storeInfo.length === 0) return;
 
     setIsGeneratingMap(true);
-    setMapError(null);
-    setMapUrl(null);
+    setMapError({[index]: ''});
+    setMapUrl({[index]: ''});
 
     try {
       const response = await fetch('/api/generate-map-url', {
@@ -98,10 +98,10 @@ export default function ImageUpload() {
       }
 
       if (data.map_url) {
-        setMapUrl(data.map_url);
+        setMapUrl({[index]: data.map_url});
       }
     } catch (err) {
-      setMapError(err instanceof Error ? err.message : 'エラーが発生しました');
+      setMapError({[index]: err instanceof Error ? err.message : 'エラーが発生しました'});
     } finally {
       setIsGeneratingMap(false);
     }
@@ -184,12 +184,12 @@ export default function ImageUpload() {
                       {isGeneratingMap ? '生成中...' : 'Google Maps URLを生成'}
                     </button>
                     {mapError && (
-                      <p className="text-danger mt-2">{mapError}</p>
+                      <p className="text-danger mt-2">{mapError[index]}</p>
                     )}
-                    {mapUrl && (
+                    {mapUrl[index] && (
                       <div className="mt-2">
                         <a
-                          href={mapUrl}
+                          href={mapUrl[index]}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn btn-outline-primary"
