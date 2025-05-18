@@ -24,10 +24,25 @@ export default function ImageUpload() {
   const [preview, setPreview] = useState<string>('');
   const [storeInfo, setStoreInfo] = useState<StoreInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGeneratingMap, setIsGeneratingMap] = useState(false);
+  const [isGeneratingMap, setIsGeneratingMap] = useState<{ [key: number]: boolean}>({});
   const [error, setError] = useState<string | null>(null);
   const [mapUrl, setMapUrl] = useState<{ [key: number]: string }>({});
   const [mapError, setMapError] = useState<{ [key: number]: string }>({});
+
+  const handleReset = () => {
+    setPreview('');
+    setStoreInfo([]);
+    setIsLoading(false);
+    setIsGeneratingMap({});
+    setError(null);
+    setMapUrl({});
+    setMapError({});
+    // Reset file input
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,7 +93,7 @@ export default function ImageUpload() {
   const handleGenerateMapUrl = async (index: number) => {
     if (storeInfo.length === 0) return;
 
-    setIsGeneratingMap(true);
+    setIsGeneratingMap({ [index]: true});
     setMapError({[index]: ''});
     setMapUrl({[index]: ''});
 
@@ -103,7 +118,7 @@ export default function ImageUpload() {
     } catch (err) {
       setMapError({[index]: err instanceof Error ? err.message : 'エラーが発生しました'});
     } finally {
-      setIsGeneratingMap(false);
+      setIsGeneratingMap({ [index]: false });
     }
   };
 
@@ -125,9 +140,16 @@ export default function ImageUpload() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn btn-primary"
+                className="btn btn-primary me-2"
               >
                 {isLoading ? '解析中...' : '解析する'}
+              </button>
+              <button
+                type="button"
+                onClick={handleReset}
+                className="btn btn-secondary"
+              >
+                リセット
               </button>
             </form>
           </div>
@@ -178,10 +200,10 @@ export default function ImageUpload() {
                   <div className="mt-3">
                     <button
                       onClick={() => handleGenerateMapUrl(index)}
-                      disabled={isGeneratingMap}
+                      disabled={isGeneratingMap[index]}
                       className="btn btn-success"
                     >
-                      {isGeneratingMap ? '生成中...' : 'Google Maps URLを生成'}
+                      {isGeneratingMap[index] ? '生成中...' : 'Google Maps URLを生成'}
                     </button>
                     {mapError && (
                       <p className="text-danger mt-2">{mapError[index]}</p>
