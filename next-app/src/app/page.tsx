@@ -1,8 +1,48 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import ImageUpload from '@/components/ImageUpload';
 
 export default function Home() {
+  const [isBackendHealthy, setIsBackendHealthy] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkBackendHealth = async () => {
+      try {
+        const response = await fetch('/api/health');
+        const data = await response.json();
+        if (data.status === 'ok') {
+          setIsBackendHealthy(true);
+        }
+      } catch (error) {
+        console.error('Backend health check failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkBackendHealth();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isBackendHealthy) {
+    return (
+      <div className="alert alert-danger m-3" role="alert">
+        バックエンドサーバーに接続できません。サーバーが起動しているか確認してください。
+      </div>
+    );
+  }
+
   return (
     <main>
       <h1 className="display-4 mb-4 text-center text-primary fw-bold" style={{
