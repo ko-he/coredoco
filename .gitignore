@@ -41,4 +41,17 @@ coverage/
 
 # Upload directories
 next-app/public/uploads/
-static/uploads/ 
+static/uploads/
+
+# Next.js specific
+.next/
+next-app/.next/
+next-app/out/
+next-app/.vercel/
+next-app/.swc/
+next-app/.turbo
+next-app/node_modules/.cache/
+next-app/.env*.local
+next-app/.env.development
+next-app/.env.test
+next-app/.env.production 
