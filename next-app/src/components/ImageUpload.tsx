@@ -26,7 +26,7 @@ export default function ImageUpload() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingMap, setIsGeneratingMap] = useState<{ [key: number]: boolean}>({});
   const [error, setError] = useState<string | null>(null);
-  const [mapUrl, setMapUrl] = useState<{ [key: number]: string }>({});
+  const [mapUrl, setMapUrl] = useState<{ [key: number]: string | undefined }>({});
   const [mapError, setMapError] = useState<{ [key: number]: string }>({});
 
   const handleReset = () => {
@@ -93,9 +93,9 @@ export default function ImageUpload() {
   const handleGenerateMapUrl = async (index: number) => {
     if (storeInfo.length === 0) return;
 
-    setIsGeneratingMap({ [index]: true});
-    setMapError({[index]: ''});
-    setMapUrl({[index]: ''});
+    setIsGeneratingMap(prev => ({ ...prev, [index]: true }));
+    setMapError(prev => ({ ...prev, [index]: '' }));
+    setMapUrl(prev => ({ ...prev, [index]: '' }));
 
     try {
       const response = await fetch('/api/generate-map-url', {
@@ -113,12 +113,12 @@ export default function ImageUpload() {
       }
 
       if (data.map_url) {
-        setMapUrl({[index]: data.map_url});
+        setMapUrl(prev => ({ ...prev, [index]: data.map_url }));
       }
     } catch (err) {
-      setMapError({[index]: err instanceof Error ? err.message : 'エラーが発生しました'});
+      setMapError(prev => ({ ...prev, [index]: err instanceof Error ? err.message : 'エラーが発生しました' }));
     } finally {
-      setIsGeneratingMap({ [index]: false });
+      setIsGeneratingMap(prev => ({ ...prev, [index]: false }));
     }
   };
 
@@ -152,19 +152,6 @@ export default function ImageUpload() {
                 リセット
               </button>
             </form>
-          </div>
-        </div>
-      </div>
-
-      <div className="col-12 col-md-6">
-        <div className="card">
-          <div className="card-body">
-            <h2 className="card-title h4 mb-4">アップロードされた画像</h2>
-            {preview ? (
-              <img src={preview} alt="プレビュー" className="img-fluid" />
-            ) : (
-              <p className="text-muted">画像を選択してください</p>
-            )}
           </div>
         </div>
       </div>
@@ -225,6 +212,19 @@ export default function ImageUpload() {
               ))
             ) : (
               <p className="text-muted">画像をアップロードしてください</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="col-12 col-md-6">
+        <div className="card">
+          <div className="card-body">
+            <h2 className="card-title h4 mb-4">アップロードされた画像</h2>
+            {preview ? (
+              <img src={preview} alt="プレビュー" className="img-fluid" />
+            ) : (
+              <p className="text-muted">画像を選択してください</p>
             )}
           </div>
         </div>

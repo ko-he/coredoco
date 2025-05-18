@@ -16,7 +16,7 @@ export default function Home() {
         borderRadius: "10px",
         display: "inline-block"
       }}>これどこ？アプリ</h1>
-      <div className="card">
+      <div>
         <ImageUpload />
       </div>
     </main>
