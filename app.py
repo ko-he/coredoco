@@ -4,7 +4,7 @@ from flask_cors import CORS
 import google.generativeai as genai
 from PIL import Image
 import io
-from config import GEMINI_API_KEY
+from config import GEMINI_API_KEY, PORT
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -17,7 +17,7 @@ model = genai.GenerativeModel('gemini-2.0-flash')
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return '{"status": "ok"}'
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
@@ -145,4 +145,4 @@ def generate_map_url():
     return jsonify(map_info)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=PORT)
