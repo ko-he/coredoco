@@ -7,6 +7,8 @@ if ENVIRONMENT == 'development':
     # .envファイルから環境変数を読み込む
     load_dotenv()
 
+PORT = os.getenv('PORT')
+
 # APIキーの設定
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 if not GEMINI_API_KEY:
