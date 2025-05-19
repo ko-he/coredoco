@@ -12,7 +12,7 @@ export default function Home() {
       try {
         const response = await fetch('/api/health');
         const data = await response.json();
-        if (data.status === 'ok') {
+        if (data.status === 'healthy') {
           setIsBackendHealthy(true);
         }
       } catch (error) {

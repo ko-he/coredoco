@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
 
-const FLASK_API_URL = process.env.FLASK_API_URL || 'http://localhost:5000';
-
 export async function GET() {
   try {
-    const response = await fetch(`${FLASK_API_URL}/`);
-    const data = await response.json();
-    return NextResponse.json(data);
+    return NextResponse.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      service: 'nextjs'
+    });
   } catch (error) {
-    console.error('Backend health check failed:', error);
+    console.error('Health check failed:', error);
     return NextResponse.json(
-      { error: 'Backend server is not available' },
-      { status: 503 }
+      { status: 'unhealthy', error: 'Internal server error' },
+      { status: 500 }
     );
   }
 } 
